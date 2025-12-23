@@ -70,39 +70,51 @@ export class ConversationController {
     // Call OpenRouter API
     const openRouterKey =
       this.configService.get<string>('OPENROUTER_KEY') || '';
-    const response = await fetch(
-      'https://openrouter.ai/api/v1/chat/completions',
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${openRouterKey}`,
-          'Content-Type': 'application/json',
+
+    try {
+      const response = await fetch(
+        'https://openrouter.ai/api/v1/chat/completions',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${openRouterKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            //   model: 'deepseek/deepseek-chat-v3.1:free',
+            model: 'deepseek/deepseek-r1-0528:free',
+            messages: formattedMessages,
+          }),
         },
-        body: JSON.stringify({
-          model: 'deepseek/deepseek-chat-v3.1:free',
-          messages: formattedMessages,
-        }),
-      },
-    );
+      );
 
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`OpenRouter API error: ${response.statusText}`);
+      }
+      const result = (await response.json()) as IOpenRouterResponse;
+
+      const assistantReply = result?.choices?.[0]?.message?.content || '...';
+      const updatedConversation = await this.conversationService.appendMessage(
+        userId,
+        conversationId,
+        'assistant',
+        assistantReply,
+      );
+
+      return {
+        conversationId: updatedConversation.conversationId,
+        reply: assistantReply,
+        context: updatedConversation.messages,
+      };
+    } catch (err) {
+      throw new BadRequestException(
+        'An error occurred with openrouter communication',
+        {
+          cause: err,
+          description: `Openrouter misbehaving`,
+        },
+      );
     }
-    const result = (await response.json()) as IOpenRouterResponse;
-
-    const assistantReply = result?.choices?.[0]?.message?.content || '...';
-    const updatedConversation = await this.conversationService.appendMessage(
-      userId,
-      conversationId,
-      'assistant',
-      assistantReply,
-    );
-
-    return {
-      conversationId: updatedConversation.conversationId,
-      reply: assistantReply,
-      context: updatedConversation.messages,
-    };
   }
 
   @Get('user')
