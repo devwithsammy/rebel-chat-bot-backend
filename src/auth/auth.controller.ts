@@ -7,7 +7,7 @@ import type { Request, Response } from 'express';
 import type {
   IAuthenticatedRequest,
   IGoogleAuthRequest,
-} from 'src/common/types/authenticated-request.interface';
+} from '../common/types/authenticated-request.interface';
 
 @Controller('auth')
 export class AuthController {

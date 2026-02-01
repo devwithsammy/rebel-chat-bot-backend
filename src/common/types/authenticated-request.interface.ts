@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { TUserRole } from 'src/auth/user.type';
+import { TUserRole } from '../../auth/user.type';
 
 export interface IAuthenticatedRequest extends Request {
   user?: {

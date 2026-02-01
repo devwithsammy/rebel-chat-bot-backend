@@ -5,11 +5,11 @@ import { Model } from 'mongoose';
 import { Conversation } from './conversation.schema';
 import { TMessageRole } from './conversation.interfaces';
 import { randomUUID } from 'crypto';
-import { IAuthenticatedRequest } from 'src/common/types/authenticated-request.interface';
+import { IAuthenticatedRequest } from '../common/types/authenticated-request.interface';
 import { ConfigService } from '@nestjs/config';
-import { validateUserId } from 'src/common/helpers/validateUserId.helper';
+import { validateUserId } from '../common/helpers/validateUserId.helper';
 import { StartConversationDto } from './dto/start-conversation.dto';
-import { IOpenRouterResponse } from 'src/common/types/openRouter.interface';
+import { IOpenRouterResponse } from '../common/types/openRouter.interface';
 
 @Injectable()
 export class ConversationService {

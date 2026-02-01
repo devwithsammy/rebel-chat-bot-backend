@@ -1,20 +1,17 @@
 import {
-  Controller,
-  Post,
-  Body,
-  Req,
-  UseGuards,
-  BadRequestException,
-  UnauthorizedException,
-  Get,
-  Param,
+     Body,
+     Controller,
+     Get,
+     Param,
+     Post,
+     Req,
+     UseGuards
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 
-import { JWTAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import type { IAuthenticatedRequest } from 'src/common/types/authenticated-request.interface';
 import { ConfigService } from '@nestjs/config';
-import { IOpenRouterResponse } from 'src/common/types/openRouter.interface';
+import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { IAuthenticatedRequest } from '../common/types/authenticated-request.interface';
 import { StartConversationDto } from './dto/start-conversation.dto';
 
 @Controller('conversation')
