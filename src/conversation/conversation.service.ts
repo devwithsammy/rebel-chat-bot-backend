@@ -124,7 +124,10 @@ export class ConversationService {
       this.configService.get<string>('OPENROUTER_KEY') || '';
 
     try {
-      const response = await fetch(
+     const model = this.configService.get<string>('OPENROUTER_MODEL') || ''; //put this in env 
+
+     
+     const response = await fetch(
         'https://openrouter.ai/api/v1/chat/completions',
         {
           method: 'POST',
@@ -133,8 +136,7 @@ export class ConversationService {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            //   model: 'deepseek/deepseek-chat-v3.1:free',
-            model: 'deepseek/deepseek-r1-0528:free',
+            model,
             messages: formattedMessages,
           }),
         },
@@ -159,6 +161,7 @@ export class ConversationService {
         context: updatedConversation.messages,
       };
     } catch (err) {
+     console.log(err)
       throw new BadRequestException(
         'An error occurred with openrouter communication',
         {

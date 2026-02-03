@@ -22,11 +22,21 @@ import Joi from 'joi';
       isGlobal: true,
       envFilePath: '.env',
       validationSchema: Joi.object({
+     
         MONGODB_URI: Joi.string().required(),
         NODE_ENV: Joi.string()
           .required()
           .valid('development', 'production', 'preproduction'),
+        OPENROUTER_KEY: Joi.string().required(),
+        OPENROUTER_MODEL: Joi.string().required(),
+        GOOGLE_CLIENT_ID: Joi.string().required(),
+        GOOGLE_CLIENT_SECRET: Joi.string().required(),
+        GOOGLE_CALLBACK_URL: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        JWT_EXPIRES_IN: Joi.string().required(),
+        FRONTEND_URL: Joi.string().required(),
       }),
+
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
