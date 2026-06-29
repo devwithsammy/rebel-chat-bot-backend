@@ -22,7 +22,6 @@ import Joi from 'joi';
       isGlobal: true,
       envFilePath: '.env',
       validationSchema: Joi.object({
-     
         MONGODB_URI: Joi.string().required(),
         NODE_ENV: Joi.string()
           .required()
@@ -36,7 +35,6 @@ import Joi from 'joi';
         JWT_EXPIRES_IN: Joi.string().required(),
         FRONTEND_URL: Joi.string().required(),
       }),
-
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -44,20 +42,26 @@ import Joi from 'joi';
       useFactory: (configService: ConfigService) => {
         let baseUri = configService.get<string>('MONGODB_URI');
         const dbUser = configService.get<string>('DB_USER');
-        const dbUserPass = configService.get<string>('DB_PASS');
+        const dbUserPass = configService.get<string>('DB_PASSWORD');
         const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
 
         if (!(baseUri && dbUser && dbUserPass && nodeEnv)) {
           throw new Error('❌ ENV varibles not set to connect to MONGODB.');
         }
 
-        baseUri = baseUri.replace('<password>', dbUserPass);
-        baseUri = baseUri.replace('<user>', dbUser);
-        const envSuffix =
-          nodeEnv === 'production' ? '/production' : '/development';
+        baseUri = baseUri.replace('<db_user>', dbUser);
+        baseUri = baseUri.replace('<db_password>', dbUserPass);
 
-        const mongoUri = `${baseUri}${envSuffix}`;
-
+        const mongoUri = `${baseUri}`;
+        const searchText = '27017/';
+        const idx = mongoUri.indexOf(searchText);
+        let envSuffix = '';
+        if (idx !== -1) {
+          envSuffix = mongoUri.substring(
+            idx + searchText.length,
+            idx + searchText.length + 11,
+          );
+        }
         console.log(`✅ Connecting to MongoDB in ${envSuffix}  environment`);
 
         return {

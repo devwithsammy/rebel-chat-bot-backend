@@ -46,7 +46,7 @@ CORS_ORIGINS=http://localhost:3000,http://your-production-frontend.com
 # MongoDB Configuration
 MONGODB_URI=mongodb+srv://<user>:<password>@cluster0.mongodb.net
 DB_USER=your_db_username
-DB_PASS=your_db_password
+DB_PASSWORD=your_db_password
 
 # JWT Authentication
 JWT_SECRET=your_super_secret_jwt_key
