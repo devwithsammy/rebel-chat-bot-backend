@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -50,7 +54,10 @@ export class ConversationService {
     return convo;
   }
 
-  async getConversationContext(req: IAuthenticatedRequest, conversationId: string) {
+  async getConversationContext(
+    req: IAuthenticatedRequest,
+    conversationId: string,
+  ) {
     const userId = await validateUserId(req);
     const convo = await this.getConversation(userId, conversationId);
     if (!convo) {
@@ -60,7 +67,7 @@ export class ConversationService {
   }
 
   async getUserConversations(req: IAuthenticatedRequest) {
-     const userId = await validateUserId(req)
+    const userId = await validateUserId(req);
     return this.conversationModel
       .find({ userId })
       .select('conversationId createdAt updatedAt messages')
@@ -80,10 +87,9 @@ export class ConversationService {
       );
   }
 
-  async sendMessage(body: StartConversationDto, req:IAuthenticatedRequest) {
+  async sendMessage(body: StartConversationDto, req: IAuthenticatedRequest) {
+    const userId = await validateUserId(req);
 
-     const userId =await validateUserId(req); 
-     
     if (!userId) {
       throw new UnauthorizedException('User not authenticated.');
     }
@@ -95,23 +101,14 @@ export class ConversationService {
 
     let conversationId = body?.conversationId;
     if (!conversationId) {
-      const newConversation =
-        await this.createConversation(userId);
+      const newConversation = await this.createConversation(userId);
       conversationId = newConversation.conversationId;
     }
 
     // append user message to conversation
-    await this.appendMessage(
-      userId,
-      conversationId,
-      'user',
-      prompt,
-    );
+    await this.appendMessage(userId, conversationId, 'user', prompt);
 
-    const messages = await this.getConversationContext(
-      req,
-      conversationId,
-    );
+    const messages = await this.getConversationContext(req, conversationId);
 
     // Prepare context for OpenRouter
     const formattedMessages = messages.map((m) => ({
@@ -119,15 +116,15 @@ export class ConversationService {
       content: m.content,
     }));
 
-    // Call OpenRouter API
-    const openRouterKey =
-      this.configService.get<string>('OPENROUTER_KEY') || '';
-
     try {
-     const model = this.configService.get<string>('OPENROUTER_MODEL') || ''; //put this in env 
+      // Call OpenRouter API
+      const openRouterKey = this.configService.get<string>('OPENROUTER_KEY');
+      const model = this.configService.get<string>('OPENROUTER_MODEL'); //put this in env
+      if (!openRouterKey || !model) {
+        throw new BadRequestException('OpenRouter key or model not found.');
+      }
 
-     
-     const response = await fetch(
+      const response = await fetch(
         'https://openrouter.ai/api/v1/chat/completions',
         {
           method: 'POST',
@@ -141,7 +138,6 @@ export class ConversationService {
           }),
         },
       );
-
       if (!response.ok) {
         throw new Error(`OpenRouter API error: ${response.statusText}`);
       }
@@ -161,7 +157,6 @@ export class ConversationService {
         context: updatedConversation.messages,
       };
     } catch (err) {
-     console.log(err)
       throw new BadRequestException(
         'An error occurred with openrouter communication',
         {

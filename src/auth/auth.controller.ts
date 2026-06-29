@@ -33,11 +33,11 @@ export class AuthController {
     const { user, token } = req.user;
     const redirectUrl = `${FRONTEND_URL}/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}&message=login_success`;
     res.redirect(redirectUrl);
-    // return {
-    //   message: 'User info from google',
-    //   user,
-    //   token,
-    // };
+    //  return {
+    //    message: 'User info from google',
+    //    user,
+    //    token,
+    //  };
   }
   @Get('profile')
   @UseGuards(JWTAuthGuard)

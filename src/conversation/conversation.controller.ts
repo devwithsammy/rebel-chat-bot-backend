@@ -1,11 +1,11 @@
 import {
-     Body,
-     Controller,
-     Get,
-     Param,
-     Post,
-     Req,
-     UseGuards
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 
@@ -33,7 +33,6 @@ export class ConversationController {
 
   @Get('user')
   async getUserConversations(@Req() req: IAuthenticatedRequest) {
-   
     const conversations =
       await this.conversationService.getUserConversations(req);
     return conversations;
@@ -43,10 +42,6 @@ export class ConversationController {
     @Param('conversationId') conversationId: string,
     @Req() req: IAuthenticatedRequest,
   ) {
- 
-    return this.conversationService.getConversationContext(
-      req,
-      conversationId,
-    );
+    return this.conversationService.getConversationContext(req, conversationId);
   }
 }
